@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#1b1b1b">
+	<title>OpenShift 4 Lab: Libvirt Baremetal UPI | The CloudShift!</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<link rel="stylesheet" href="/css/bundle.css">
+	<link rel="icon" href="/icons/16.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="/icons/32.png" sizes="32x32" type="image/png">
+		
+</head>
+<body>
+	<header class="header">
+	<a class="logo" href="/">The CloudShift!</a>
+	
+</header>
+	<div class="primary">
+	
+	<main class="main">
+		
+		<div class="single block">
+			<article class="entry">
+				<h1 class="entry__title">OpenShift 4 Lab: Libvirt Baremetal UPI</h1>
+				<div class="entry__content">
+
+<p>Hello everyone, just a couple of month ago, Red Hat has released a shiny <a href="https://docs.openshift.com" title="OpenShift 4 Docs">OpenShift 4</a> based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.</p>
+
+<h3 id="what-is-upi-and-ipi">What is UPI and IPI?</h3>
+
+<p><strong>UPI</strong>: User Provided Infrastructure (User manually prepare machine for bootstrap)<br />
+<strong>IPI</strong>: Installer Provided Infrastructure (OCP Installer automatically terraforming machine for bootstrap)</p>
+
+<h3 id="prereq">PreReq</h3>
+
+<ol>
+<li>A Valid Red Hat OpenShift subscription</li>
+<li>DNS Server (Helper Node)</li>
+<li>HAProxy Server (Helper Node)</li>
+<li>DHCP Server (Helper Node)</li>
+<li>PXE/TFTP Server (Helper Node)</li>
+<li>Libvirt Host</li>
+<li>VM Requirement:</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th>vCPU</th>
+<th>Memory(GB)</th>
+<th>Disk(GB)</th>
+<th>OS</th>
+<th>Hostname</th>
+<th>Count</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Helper(Bastion)</td>
+<td>4</td>
+<td>4</td>
+<td>50</td>
+<td>RHEL 8</td>
+<td>helper.topimerah.net</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>Bootstrap</td>
+<td>4</td>
+<td>6</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>bootstrap.topimerah.net</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>Master</td>
+<td>4</td>
+<td>8</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>master[1-3].topimerah.net</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td>Worker</td>
+<td>4</td>
+<td>8</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>worker[1-3].topimerah.net</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+
+<ol>
+<li>SDN Requirement:</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th>CIDR</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Cluster Network</td>
+<td>10.128.0.0/14</td>
+</tr>
+
+<tr>
+<td>Cluster Network Host Prefix</td>
+<td>/23</td>
+</tr>
+
+<tr>
+<td>Service Network</td>
+<td>172.30.0.0/16</td>
+</tr>
+</tbody>
+</table>
+</div>
+				
+			</article>
+		</div>
+	</main>
+	
+	
+
+
+
+	
+
+	</div>
+	<footer class="footer">
+	<div class="footer__copyright">© 2020 The CloudShift!. <span class="footer__copyright-credits">Powered by <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/vimux/binario" rel="nofollow noopener" target="_blank">Binario</a> theme.</span></div>
+</footer>
+</body>
+</html>
