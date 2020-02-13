@@ -8,11 +8,6 @@
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2020-02-14T00:30:41+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/libvirt/</loc>
     <lastmod>2020-02-14T00:30:41+08:00</lastmod>
   </url>
@@ -39,6 +34,11 @@
   
   <url>
     <loc>/tags/</loc>
+    <lastmod>2020-02-14T00:30:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
     <lastmod>2020-02-14T00:30:41+08:00</lastmod>
   </url>
   

@@ -67,6 +67,8 @@
 <main>
 
 
+<h1 id="introduction"><strong><em>Introduction</em></strong></h1>
+
 <p>Hello everyone, just a couple of month ago, Red Hat has released a shiny <a href="https://docs.openshift.com" title="OpenShift 4 Docs">OpenShift 4</a> based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.</p>
 
 <h3 id="what-is-upi-and-ipi">What is UPI and IPI?</h3>
@@ -142,9 +144,9 @@
 </tbody>
 </table>
 
-<ol>
-<li>SDN Requirement:</li>
-</ol>
+<p><strong>NOTE</strong>: Ensure boot order are correct, should only boot <strong>ONCE</strong> using network.</p>
+
+<p>For OpenShift SDN Requirement:</p>
 
 <table>
 <thead>
@@ -171,6 +173,84 @@
 </tr>
 </tbody>
 </table>
+
+<h1 id="steps"><strong><em>Steps</em></strong></h1>
+
+<p>In brief, what we goind to do:<br />
+  * Configure WebServer, DNS, DHCP and PXE on Helper Node.<br />
+  * Configure HAProxy on Helper Node.<br />
+  * Download and prepare OpenShift installer and client binaries on Helper Node.<br />
+  * Prepare Ignition files.<br />
+  * Bootup all OCP VMs.</p>
+
+<h3 id="a-configure-dns">A. Configure DNS</h3>
+
+<ol>
+<li><p>Install bind packages</p>
+
+<pre><code>root@helper #&gt; dnf -y install bind bind-utils
+</code></pre></li>
+
+<li><p>Comment out below lines from <strong>/etc/named.conf</strong>:</p>
+
+<pre><code>#listen-on port 53 { 127.0.0.1; };  
+#listen-on-v6 port 53 { ::1; };
+</code></pre></li>
+
+<li><p>Allow query from the subnet, set this in <strong>/etc/named.conf</strong>:</p>
+
+<pre><code>allow-query     { localhost;192.168.0.0/24; };
+</code></pre></li>
+
+<li><p>Create a Forward DNS zone in <strong>/etc/named.conf</strong>:</p>
+
+<pre><code>zone &quot;topimerah.net&quot; IN {
+    type master;
+    file &quot;topimerah.net.db&quot;; 
+    allow-update { none; };
+};
+</code></pre></li>
+
+<li><p>Create a Reverse DNS zone in <strong>/etc/named.conf</strong>:</p>
+
+<pre><code>zone “50.168.192.in-addr.arpa” {
+    type master;
+    file “/var/named/50.168.192.in-addr.arpa”
+};
+</code></pre></li>
+
+<li><p>Create a zone database file in /var/named/topimerah.net.db with below content:</p>
+
+<pre><code>$TTL      1D
+@         IN  SOA dns.ocp4.topimerah.net. root.topimerah.net. (
+               2019022400 ; serial
+               3h         ; refresh
+               15         ; retry
+               1w         ; expire
+               3h         ; minimum
+                                                                     )
+          IN  NS  dns.ocp4.topimerah.net.
+dns.ocp4                        IN  A       192.168.50.30
+bootstrap.ocp4                  IN  A       192.168.50.60
+master01.ocp4                   IN  A       192.168.50.61
+master02.ocp4                   IN  A       192.168.50.62
+master03.ocp4                   IN  A       192.168.50.63
+etcd-0.ocp4                     IN  A       192.168.50.61
+etcd-1.ocp4                     IN  A       192.168.50.62
+etcd-2.ocp4                     IN  A       192.168.50.63
+api.ocp4                        IN  A       192.168.50.30
+api-int.ocp4                    IN  A       192.168.50.30
+*.apps.ocp4                     IN  A       192.168.50.30
+worker01.ocp4                   IN  A       192.168.50.64
+worker02.ocp4                   IN  A       192.168.50.64
+worker03.ocp4                   IN  A       192.168.50.66
+_etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-0.ocp4
+_etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-1.ocp4
+_etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-2.ocp4 
+</code></pre></li>
+
+<li><p>Create a zone database file in /var/named/topimerah.net.db with below content:</p></li>
+</ol>
 
 </main>
 
@@ -222,7 +302,17 @@
 </footer>
 
 
+<script src="//yihui.name/js/math-code.js"></script>
+<script async src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.12.0/languages/r.min.js"></script>
+<script>
+hljs.configure({languages: []});
+hljs.initHighlightingOnLoad();
+</script>
 
 
 

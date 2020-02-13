@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hugo XMag on The CloudShift</title>
+    <title>The CloudShift</title>
     <link>/</link>
-    <description>Recent content in Hugo XMag on The CloudShift</description>
+    <description>Recent content on The CloudShift</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 14 Feb 2020 00:30:41 +0800</lastBuildDate>
@@ -17,7 +17,7 @@
       <pubDate>Fri, 14 Feb 2020 00:30:41 +0800</pubDate>
       
       <guid>/post/2020/02/14/openshift-4-lab-libvirt-baremetal-upi/</guid>
-      <description>Hello everyone, just a couple of month ago, Red Hat has released a shiny OpenShift 4 based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.
+      <description>Introduction Hello everyone, just a couple of month ago, Red Hat has released a shiny OpenShift 4 based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.
 What is UPI and IPI? UPI: User Provided Infrastructure (User manually prepare machine for bootstrap)
 IPI: Installer Provided Infrastructure (OCP Installer automatically terraforming machine for bootstrap)
 PreReq  A Valid Red Hat OpenShift subscription DNS Server (Helper Node) HAProxy Server (Helper Node) DHCP Server (Helper Node) PXE/TFTP Server (Helper Node) Libvirt Host VM Requirement:     Node vCPU Memory(GB) Disk(GB) OS Hostname Count     Helper(Bastion) 4 4 50 RHEL 8 helper.</description>
