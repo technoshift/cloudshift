@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on The CloudShift</title>
-    <link>https://www.topimerah.net/post/</link>
-    <description>Recent content in Posts on The CloudShift</description>
+    <title>Posts on Hugo XMag</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Hugo XMag</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; Copyright notice</copyright>
     <lastBuildDate>Fri, 14 Feb 2020 00:30:41 +0800</lastBuildDate>
     
-	<atom:link href="https://www.topimerah.net/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>OpenShift 4 Lab: Libvirt Baremetal UPI</title>
-      <link>https://www.topimerah.net/post/ocp4_libvirt_upi_bm/</link>
+      <link>/post/2020/02/14/openshift-4-lab-libvirt-baremetal-upi/</link>
       <pubDate>Fri, 14 Feb 2020 00:30:41 +0800</pubDate>
       
-      <guid>https://www.topimerah.net/post/ocp4_libvirt_upi_bm/</guid>
+      <guid>/post/2020/02/14/openshift-4-lab-libvirt-baremetal-upi/</guid>
       <description>Hello everyone, just a couple of month ago, Red Hat has released a shiny OpenShift 4 based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.
 What is UPI and IPI? UPI: User Provided Infrastructure (User manually prepare machine for bootstrap)
 IPI: Installer Provided Infrastructure (OCP Installer automatically terraforming machine for bootstrap)

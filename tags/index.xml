@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on The CloudShift</title>
-    <link>https://www.topimerah.net/tags/</link>
-    <description>Recent content in Tags on The CloudShift</description>
+    <title>Tags on Hugo XMag</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on Hugo XMag</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; Copyright notice</copyright>
+    <lastBuildDate>Fri, 14 Feb 2020 00:30:41 +0800</lastBuildDate>
     
-	<atom:link href="https://www.topimerah.net/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Libvirt</title>
+      <link>/tags/libvirt/</link>
+      <pubDate>Fri, 14 Feb 2020 00:30:41 +0800</pubDate>
+      
+      <guid>/tags/libvirt/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>OpenShift</title>
+      <link>/tags/openshift/</link>
+      <pubDate>Fri, 14 Feb 2020 00:30:41 +0800</pubDate>
+      
+      <guid>/tags/openshift/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
