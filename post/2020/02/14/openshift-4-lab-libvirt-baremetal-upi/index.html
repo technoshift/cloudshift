@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>OpenShift 4 Lab: Libvirt Baremetal UPI | The CloudShift</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+
+  </head>
+
+  <body class="page">
+    <nav class="header">
+      <div class="banner">
+<a href="/" class="text">
+&Tfr;&Hfr;&Efr; &Cfr;&Lfr;&Ofr;&Ufr;&Dfr;&Sfr;&Hfr;&Ifr;&Ffr;&Tfr;
+</a>
+</div>
+
+      <div class="head-meta">
+      
+        <span><a href="/">&larr; Back to Home</a></span>
+        <span class="date">2020-02-14</span>
+        
+        
+        
+          
+        
+        
+        
+        <span><a href="https://github.com/technoshift/cloudshift/content/post/2020-02-14-ocp4_libvirt_upi_bm.md">Edit this page &rarr;</a></span>
+        
+        
+      
+      </div>
+    </nav>
+
+<div class="container">
+<article>
+<div class="article-meta">
+
+  <div class="categories">
+  
+    <a href="/categories/openshift">OpenShift</a>
+  
+  </div>
+
+  <h1><span class="title">OpenShift 4 Lab: Libvirt Baremetal UPI</span></h1>
+
+  
+  <h3 class="author">Muhammad Aizuddin
+</h3>
+  
+
+  
+  <p>Tags: <a href="/tags/openshift">OpenShift</a>; <a href="/tags/libvirt">Libvirt</a>
+  </p>
+  
+  
+
+</div>
+
+
+
+<main>
+
+
+<p>Hello everyone, just a couple of month ago, Red Hat has released a shiny <a href="https://docs.openshift.com" title="OpenShift 4 Docs">OpenShift 4</a> based on CoreOS technology. In this guide, we going to see how we can install OCP4 UPI on libvirt.</p>
+
+<h3 id="what-is-upi-and-ipi">What is UPI and IPI?</h3>
+
+<p><strong>UPI</strong>: User Provided Infrastructure (User manually prepare machine for bootstrap)<br />
+<strong>IPI</strong>: Installer Provided Infrastructure (OCP Installer automatically terraforming machine for bootstrap)</p>
+
+<h3 id="prereq">PreReq</h3>
+
+<ol>
+<li>A Valid Red Hat OpenShift subscription</li>
+<li>DNS Server (Helper Node)</li>
+<li>HAProxy Server (Helper Node)</li>
+<li>DHCP Server (Helper Node)</li>
+<li>PXE/TFTP Server (Helper Node)</li>
+<li>Libvirt Host</li>
+<li>VM Requirement:</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th>vCPU</th>
+<th>Memory(GB)</th>
+<th>Disk(GB)</th>
+<th>OS</th>
+<th>Hostname</th>
+<th>Count</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Helper(Bastion)</td>
+<td>4</td>
+<td>4</td>
+<td>50</td>
+<td>RHEL 8</td>
+<td>helper.topimerah.net</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>Bootstrap</td>
+<td>4</td>
+<td>6</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>bootstrap.topimerah.net</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>Master</td>
+<td>4</td>
+<td>8</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>master[1-3].topimerah.net</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td>Worker</td>
+<td>4</td>
+<td>8</td>
+<td>50</td>
+<td>RHCOS</td>
+<td>worker[1-3].topimerah.net</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+
+<ol>
+<li>SDN Requirement:</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th>CIDR</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Cluster Network</td>
+<td>10.128.0.0/14</td>
+</tr>
+
+<tr>
+<td>Cluster Network Host Prefix</td>
+<td>/23</td>
+</tr>
+
+<tr>
+<td>Service Network</td>
+<td>172.30.0.0/16</td>
+</tr>
+</tbody>
+</table>
+
+</main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="post-nav">
+  <span class="nav-prev"></span>
+  <span class="nav-next"></span>
+</nav>
+
+
+
+</article>
+</div>
+
+<script async src="//yihui.name/js/center-img.js"></script>
+
+<footer>
+
+<div class="footer">
+  <ul class="menu">
+    
+    <li><a href="/"><span data-hover="Home">Home</span></a></li>
+    
+    <li><a href="/categories/"><span data-hover="Categories">Categories</span></a></li>
+    
+    <li><a href="/tags/"><span data-hover="Tags">Tags</span></a></li>
+    
+  </ul>
+  
+  <div class="copyright">&copy; <a href="https://">topimerah.net</a> 2020 | <a href="https://github.com/aizuddin85">Github</a> | <a href="https://linkedin.com/aizuddinzali">LinkedIn</a></div>
+  
+</div>
+</footer>
+
+
+
+
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'https:\/\/www.googletagmanager.com\/gtag\/js?id=UA-158373688-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+</body>
+</html>
+

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hugo XMag</title>
+    <title>Hugo XMag on The CloudShift</title>
     <link>/</link>
-    <description>Recent content on Hugo XMag</description>
+    <description>Recent content in Hugo XMag on The CloudShift</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 14 Feb 2020 00:30:41 +0800</lastBuildDate>
