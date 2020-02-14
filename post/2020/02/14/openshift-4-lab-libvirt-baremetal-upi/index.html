@@ -108,7 +108,7 @@
 <td>4</td>
 <td>50</td>
 <td>RHEL 8</td>
-<td>helper.topimerah.net</td>
+<td>helper.cldshft.com</td>
 <td>1</td>
 </tr>
 
@@ -118,7 +118,7 @@
 <td>6</td>
 <td>50</td>
 <td>RHCOS</td>
-<td>bootstrap.topimerah.net</td>
+<td>bootstrap.cldshft.com</td>
 <td>1</td>
 </tr>
 
@@ -128,7 +128,7 @@
 <td>8</td>
 <td>50</td>
 <td>RHCOS</td>
-<td>master[1-3].topimerah.net</td>
+<td>master[01-03].cldshft.com</td>
 <td>3</td>
 </tr>
 
@@ -138,7 +138,7 @@
 <td>8</td>
 <td>50</td>
 <td>RHCOS</td>
-<td>worker[1-3].topimerah.net</td>
+<td>worker[01-03].cldshft.com</td>
 <td>3</td>
 </tr>
 </tbody>
@@ -204,9 +204,9 @@
 
 <li><p>Create a Forward DNS zone in <strong>/etc/named.conf</strong>:</p>
 
-<pre><code>zone &quot;topimerah.net&quot; IN {
+<pre><code>zone &quot;cldshft.com&quot; IN {
     type master;
-    file &quot;topimerah.net.db&quot;; 
+    file &quot;cldshft.com.db&quot;; 
     allow-update { none; };
 };
 </code></pre></li>
@@ -219,38 +219,464 @@
 };
 </code></pre></li>
 
-<li><p>Create a zone database file in /var/named/topimerah.net.db with below content:</p>
+<li><p>Create a zone database file in /var/named/cldshft.com.db with below content:</p>
 
-<pre><code>$TTL      1D
-@         IN  SOA dns.ocp4.topimerah.net. root.topimerah.net. (
+<pre><code>$TTL      60
+@         IN  SOA dns.ocp4.cldshft.com. root.cldshft.com. (
                2019022400 ; serial
                3h         ; refresh
                15         ; retry
                1w         ; expire
                3h         ; minimum
-                                                                     )
-          IN  NS  dns.ocp4.topimerah.net.
+                                                                )
+          IN  NS  dns.ocp4.cldshft.com.
 dns.ocp4                        IN  A       192.168.50.30
 bootstrap.ocp4                  IN  A       192.168.50.60
 master01.ocp4                   IN  A       192.168.50.61
 master02.ocp4                   IN  A       192.168.50.62
 master03.ocp4                   IN  A       192.168.50.63
-etcd-0.ocp4                     IN  A       192.168.50.61
-etcd-1.ocp4                     IN  A       192.168.50.62
-etcd-2.ocp4                     IN  A       192.168.50.63
+etcd-0.ocp4                     IN  CNAME   master01.ocp4
+etcd-1.ocp4                     IN  CNAME   master02.ocp4
+etcd-2.ocp4                     IN  CNAME   master03.ocp4
 api.ocp4                        IN  A       192.168.50.30
 api-int.ocp4                    IN  A       192.168.50.30
 *.apps.ocp4                     IN  A       192.168.50.30
 worker01.ocp4                   IN  A       192.168.50.64
-worker02.ocp4                   IN  A       192.168.50.64
+worker02.ocp4                   IN  A       192.168.50.65
 worker03.ocp4                   IN  A       192.168.50.66
 _etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-0.ocp4
 _etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-1.ocp4
 _etcd-server-ssl._tcp.ocp4      IN  SRV     0 10    2380 etcd-2.ocp4 
 </code></pre></li>
 
-<li><p>Create a zone database file in /var/named/topimerah.net.db with below content:</p></li>
+<li><p>Create a zone database file in /var/named/50.168.192.in-addr.arpa with below content:</p>
+
+<pre><code>$TTL    60 
+@       IN SOA localhost. root.localhost. (
+                991079290 ; serial
+                28800 ; refresh
+                14400 ; retry
+                3600000 ; expire
+                86400 ; default_ttl
+                                        )
+        IN NS dns.ocp4.cldshft.com.
+30     IN      PTR     dns.ocp4.cldshft.com
+60     IN      PTR     bootstrap.ocp4.cldshft.com
+61     IN      PTR     master01.ocp4.cldshft.com
+62     IN      PTR     master02.ocp4.cldshft.com
+63     IN      PTR     master03.ocp4.cldshft.com
+64     IN      PTR     worker01.ocp4.cldshft.com
+65     IN      PTR     worker02.ocp4.cldshft.com
+66     IN      PTR     worker03.ocp4.cldshft.com
+</code></pre></li>
+
+<li><p>Enable and start named service.</p>
+
+<pre><code>root@helper #&gt; firewall-cmd --add-service=dns --permanent
+root@helper #&gt; firewall-cmd --reload
+root@helper #&gt; systemctl start named --now
+</code></pre></li>
 </ol>
+
+<h3 id="b-configure-dhcp-pxe">B. Configure DHCP/PXE</h3>
+
+<p>We going to do PXE Booting and let boot image to scan TFTP server and  <a href="https://docs.oracle.com/cd/E24628_01/em.121/e27046/appdx_pxeboot.htm#EMLCM1219" target="_blank">pull corresponding boot configuration files</a> as per VM MAC Address.</p>
+
+<table>
+<thead>
+<tr>
+<th>VM Name</th>
+<th>MAC Address</th>
+<th>PXE Boot Configuration Filename</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>bootstrap</td>
+<td>52:54:00:7d:2d:b1</td>
+<td>52-54-00-7d-2d-b1</td>
+</tr>
+
+<tr>
+<td>master01</td>
+<td>52:54:00:7d:2d:b2</td>
+<td>52-54-00-7d-2d-b2</td>
+</tr>
+
+<tr>
+<td>master02</td>
+<td>52:54:00:7d:2d:b3</td>
+<td>52-54-00-7d-2d-b3</td>
+</tr>
+
+<tr>
+<td>master03</td>
+<td>52:54:00:7d:2d:b4</td>
+<td>52-54-00-7d-2d-b4</td>
+</tr>
+
+<tr>
+<td>worker01</td>
+<td>52:54:00:7d:2d:b5</td>
+<td>52-54-00-7d-2d-b5</td>
+</tr>
+
+<tr>
+<td>worker02</td>
+<td>52:54:00:7d:2d:b6</td>
+<td>52-54-00-7d-2d-b6</td>
+</tr>
+
+<tr>
+<td>worker03</td>
+<td>52:54:00:7d:2d:c1</td>
+<td>52-54-00-7d-2d-c1</td>
+</tr>
+</tbody>
+</table>
+
+<ol>
+<li><p>Install bind packages</p>
+
+<pre><code>root@helper #&gt; dnf -y install dhcp-server tftp-server syslinux
+</code></pre></li>
+
+<li><p>Configure <strong>/etc/dhcp/dhcpd.conf</strong>:</p>
+
+<pre><code>ddns-update-style interim;
+ignore client-updates;
+authoritative;
+allow booting;
+allow bootp;
+deny unknown-clients;
+subnet 192.168.50.0 netmask 255.255.255.0 {
+        option routers 192.168.50.1;
+        option domain-name-servers 192.168.50.30;
+        option ntp-servers time.unisza.edu.my;
+        option domain-search &quot;cldshft&quot;,&quot;ocp4.cldshft.com&quot;;
+        filename &quot;pxelinux.0&quot;;
+        next-server 192.168.50.30;
+
+        host bootstrap { hardware ethernet 52:54:00:7d:2d:b1; fixed-address 192.168.50.60; option host-name &quot;bootstrap&quot;; }
+        host master01 { hardware ethernet 52:54:00:7d:2d:b2; fixed-address 192.168.50.61; option host-name &quot;master01&quot;; }
+        host master02 { hardware ethernet 52:54:00:7d:2d:b3; fixed-address 192.168.50.62; option host-name &quot;master02&quot;; }
+        host master03 { hardware ethernet 52:54:00:7d:2d:b4; fixed-address 192.168.50.63; option host-name &quot;master03&quot;; }
+        host worker01 { hardware ethernet 52:54:00:7d:2d:b5; fixed-address 192.168.50.64; option host-name &quot;worker01&quot;; }
+        host worker02 { hardware ethernet 52:54:00:7d:2d:b6; fixed-address 192.168.50.65; option host-name &quot;worker02&quot;; }
+        host worker03 { hardware ethernet 52:54:00:7d:2d:c1; fixed-address 192.168.50.66; option host-name &quot;worker03&quot;; }
+}
+</code></pre>
+
+<p><strong>NOTE:</strong> This dhcpd server configuration <strong>doest not offered any IP range lease</strong> (range option absent) and <strong>deny any client</strong> (<em>deny unknown-clients</em> option) that is not part of the host declarations. I.e static dhcp configuration.</p></li>
+
+<li><p>Now, referring back to <em>MAC Address</em> table above, we goint to create three type of boot config, bootstrap, master and worker.</p></li>
+
+<li><p>For bootstrap node, create file  <strong>/var/lib/tftpboot/pxelinux.cfg/52-54-00-7d-2d-b1</strong> with below content:</p>
+
+<pre><code>default menu.c32
+prompt 0
+timeout 2
+menu title **** OpenShift 4 Bootstrap PXE Boot Menu ****
+
+label Install CoreOS 4.3.0 Bootstrap Node
+  kernel /openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-kernel
+  append ip=dhcp rd.neednet=1 coreos.inst.install_dev=vda console=tty0 console=ttyS0 coreos.inst=yes coreos.inst.image_url=http://192.168.50.30:8080/openshift4/images/rhcos-4.3.0-x86_64-metal.raw.gz coreos.inst.ignition_url=http://192.168.50.30:8080/openshift4/4.3.0/ignitions/bootstrap.ign initrd=/openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-initramfs.img
+</code></pre></li>
+
+<li><p>For first master node. create file <strong>/var/lib/tftpboot/pxelinux.cfg/52-54-00-7d-2d-b2</strong> with below content (<strong>do this for all masters, remember to use correct PXE Boot Configuration filename</strong>):</p>
+
+<pre><code>default menu.c32
+prompt 0
+timeout 2
+menu title **** OpenShift 4 Masters PXE Boot Menu ****
+
+label Install CoreOS 4.3.0 Master Node
+  kernel /openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-kernel
+  append ip=dhcp rd.neednet=1 coreos.inst.install_dev=vda console=tty0 console=ttyS0 coreos.inst=yes coreos.inst.image_url=http://192.168.50.30:8080/openshift4/images/rhcos-4.3.0-x86_64-metal.raw.gz coreos.inst.ignition_url=http://192.168.50.30:8080/openshift4/4.3.0/ignitions/master.ign initrd=/openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-initramfs.img
+</code></pre></li>
+
+<li><p>For first worker node. create file <strong>/var/lib/tftpboot/pxelinux.cfg/52-54-00-7d-2d-b5</strong> with below content (<strong>do this for all workers, remember to use correct PXE Boot Configuration filename</strong>):</p>
+
+<pre><code>default menu.c32
+prompt 0
+timeout 2
+menu title **** OpenShift 4 Workers PXE Boot Menu ****
+
+label Install CoreOS 4.3.0 Worker Node
+  kernel /openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-kernel
+  append ip=dhcp rd.neednet=1 coreos.inst.install_dev=vda console=tty0 console=ttyS0 coreos.inst=yes coreos.inst.image_url=http://192.168.50.30:8080/openshift4/images/rhcos-4.3.0-x86_64-metal.raw.gz coreos.inst.ignition_url=http://192.168.50.30:8080/openshift4/4.3.0/ignitions/worker.ign initrd=/openshift4/4.3.0/rhcos-4.3.0-x86_64-installer-initramfs.img
+</code></pre></li>
+
+<li><p>Now, we goint to host all necessary for PXE boot i.e kernel and initramfs, create a folder and download from Red Hat CDN:</p>
+
+<pre><code>root@helper #&gt; mkdir -p /var/lib/tftpboot/openshift4/4.3.0
+root@helper #&gt; cd /var/lib/tftpboot/openshift4/4.3.0
+root@helper #&gt; wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/4.3.0/rhcos-4.3.0-x86_64-installer-kernel
+root@helper #&gt; wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/4.3.0/rhcos-4.3.0-x86_64-installer-initramfs.img
+root@helper #&gt; restorecon -RFv .
+</code></pre></li>
+
+<li><p>Copy <em>syslinux</em> required file to <strong>/var/lib/tftpboot</strong> and start dhcpd and tftp server:</p>
+
+<pre><code>root@helper #&gt; cp -rvf /usr/share/syslinux/* /var/lib/tftpboot
+root@helper #&gt; firewall-cmd --add-service=tftp --add-service=tftp-client --add-service=dhcp
+root@helper #&gt; firewall-cmd --reload
+root@helper #&gt; systemctl enable tftp --now
+root@helper #&gt; systemctl enable dhcpd --now
+</code></pre></li>
+</ol>
+
+<h3 id="c-configure-webserver">C. Configure WebServer</h3>
+
+<p>We are going to use this WebServer to host RHCOS image for kickstart process.</p>
+
+<ol>
+<li><p>Install httpd and allow firewall:</p>
+
+<pre><code>root@helper #&gt; yum install httpd -y
+root@helper #&gt; firewall-cmd --add-port=8080 --permanent
+root@helper #&gt; firewall-cmd --reload
+</code></pre></li>
+
+<li><p>Change http listen port directive to listen on port 8080 (Since we going to use this node as HAProxy that will listen on port  80 later causing conflict since we are on the same IP address). Change <strong>/etc/httpd/httpd.conf</strong> <em>Listen 80</em> to:</p>
+
+<pre><code>Listen 8080
+</code></pre></li>
+
+<li><p>Now, we goint to host all necessary file to install RHCOS, ie. OS image:</p>
+
+<pre><code>root@helper #&gt; mkdir -p /var/www/html/openshift4/4.3.0/images/
+root@helper #&gt; cd /var/www/html/openshift4/4.3.0/images/
+root@helper #&gt; wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/4.3.0/rhcos-4.3.0-x86_64-metal.raw.gz
+root@helper #&gt; restorecon -RFv .
+root@helper #&gt; chown -Rvf apache. /var/www/html/
+</code></pre></li>
+
+<li><p>Enable and start HTTPD server:</p>
+
+<pre><code>root@helper #&gt; systemctl enable httpd --now
+</code></pre></li>
+</ol>
+
+<h3 id="d-configure-haproxy-as-network-load-balancer">D. Configure HAProxy as Network Load Balancer</h3>
+
+<ol>
+<li><p>Install haproxy, allow firewall, allow SElinux:</p>
+
+<pre><code>root@helper #&gt; yum install haproxy -y
+root@helper #&gt; firewall-cmd --add-port={6443/tcp,22623/tcp,8080/tcp,32700/tcp} --permanent
+root@helper #&gt; firewall-cmd --reload
+
+root@helper #&gt;  semanage port  -a 22623 -t http_port_t -p tcp
+root@helper #&gt;  semanage port  -a 6443 -t http_port_t -p tcp
+root@helper #&gt;  semanage port  -a 32700 -t http_port_t -p tcp
+
+root@helper #&gt;  semanage port  -l  | grep -w http_port_t
+http_port_t                    tcp      22623, 32700, 6443, 80, 81, 443, 488, 8008, 8009, 8443, 9000
+</code></pre></li>
+
+<li><p>Configure <strong>/etc/haproxy/haproxy.conf</strong> with below content:</p>
+
+<pre><code>---------------------------------------------------------------------
+round robin balancing for OCP Kubernetes API Server
+---------------------------------------------------------------------
+frontend k8s_api
+        bind *:6443
+        mode tcp
+        default_backend k8s_api_backend
+
+backend k8s_api_backend
+        balance roundrobin
+        mode tcp
+        server bootstrap 192.168.50.60:6443 check
+        server master01 192.168.50.61:6443 check
+        server master02 192.168.50.62:6443 check
+        server master03 192.168.50.63:6443 check
+
+---------------------------------------------------------------------
+round robin balancing for OCP Machine Config Server
+---------------------------------------------------------------------
+frontend machine_config
+        bind *:22623
+        mode tcp
+        default_backend machine_config_backend
+backend machine_config_backend
+        balance roundrobin
+        mode tcp
+        server bootstrap 192.168.50.60:22623 check
+        server master01 192.168.50.61:22623 check
+        server master02 192.168.50.62:22623 check
+        server master03 192.168.50.63:22623 check
+
+---------------------------------------------------------------------
+round robin balancing for OCP Ingress Insecure Port
+---------------------------------------------------------------------
+frontend ingress_insecure
+        bind *:80
+        mode tcp
+        default_backend ingress_insecure_backend
+backend ingress_insecure_backend
+        balance roundrobin
+        mode tcp
+        server worker01 192.168.50.64:80 check
+        server worker02 192.168.50.65:80 check
+        server worker03 192.168.50.66:80 check
+
+---------------------------------------------------------------------
+round robin balancing for OCP Ingress Secure Port
+---------------------------------------------------------------------
+frontend ingress_secure
+        bind *:443
+        mode tcp
+        default_backend ingress_secure_backend
+backend ingress_secure_backend
+        balance roundrobin
+        mode tcp
+        server worker01 192.168.50.64:443 check
+        server worker02 192.168.50.65:443 check
+        server worker03 192.168.50.66:443 check
+
+---------------------------------------------------------------------
+Exposing HAProxy Statistic Page
+---------------------------------------------------------------------
+listen stats
+        bind :32700
+        stats enable
+        stats uri /
+        stats hide-version
+        stats auth admin:password
+</code></pre></li>
+
+<li><p>Enable and start HAProxy server:</p>
+
+<pre><code>root@helper #&gt; systemctl enable haproxy --now
+</code></pre></li>
+
+<li><p>Validate the haproxy by accessing console at <em><a href="http://192.168.50.30:32700">http://192.168.50.30:32700</a></em> with password declared in the config file.</p></li>
+</ol>
+
+<h3 id="e-configure-openshift-installer-and-required-binaries">E. Configure OpenShift Installer and required binaries</h3>
+
+<p>In this step we going to download OCP installer and client binaries from Red Hat CDN.</p>
+
+<ol>
+<li><p>Download and extract installer and client binary:</p>
+
+<pre><code>root@helper #&gt; https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.3.1.tar.gz
+root@helper #&gt; https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.3.1.tar.gz
+root@helper #&gt; tar -xvf openshift-install-linux-4.3.1.tar.gz -C /usr/bin/
+root@helper #&gt; tar -xvf openshift-client-linux-4.3.1.tar.gz-C /usr/bin/
+</code></pre></li>
+
+<li><p>Create installation folder, <strong>~/ocp4</strong> and install-config-base.yaml:</p>
+
+<pre><code>root@helper #&gt; mkdir -p ~/ocp4
+root@helper #&gt; cat install-config-base.yaml 
+apiVersion: v1
+baseDomain: techbeatly.com
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: 0
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: 3
+metadata:
+  name: ocp4
+networking:
+  clusterNetworks:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  none: {}
+pullSecret: 'Paste PullSecret from cloud.redhat.com'
+sshKey: 'Paste SSH public key'
+</code></pre>
+
+<p><strong>NOTE:</strong> We create install-config-base.yaml due to install-config.yaml will be consumed by the installer and get deleted after manifest for ignition file created.</p></li>
+
+<li><p>Copy <strong>install-config-base.yaml</strong> to <strong>install-config.yaml</strong> and execute installer binary to create ignition file:</p>
+
+<pre><code>root@helper #&gt; cp install-config-base.yaml install-config.yaml 
+
+root@helper #&gt;  openshift-install create ignition-configs  
+WARNING There are no compute nodes specified. The cluster will not fully initialize without compute nodes. 
+INFO Consuming &quot;Install Config&quot; from target directory     
+</code></pre></li>
+
+<li><p>This will create ignition file and associated files (<strong>DO NOT REUSE IGNITION FILE AFTER 24 HOURS!</strong>):</p>
+
+<pre><code> root@helper #&gt; ll
+ total 288
+ drwxr-xr-x. 2 root root     50 Jul  1 16:46 auth
+-rw-r--r--. 1 root root 276768 Jul  1 16:46 bootstrap.ign
+-rw-r--r--. 1 root root   3545 Jul  1 16:42 install-config-base.yaml
+-rw-r--r--. 1 root root   1824 Jul  1 16:46 master.ign
+-rw-r--r--. 1 root root     96 Jul  1 16:46 metadata.json
+-rw-r--r--. 1 root root   1824 Jul  1 16:46 worker.ign
+</code></pre></li>
+
+<li><p>Now we going to copy *.ign file to WebServer hosting directory for RHCOS to pull during kickstart:</p>
+
+<pre><code>root@helper #&gt; mkdir /var/www/html/openshift4/4.3.0/ignitions
+root@helper #&gt; cp -v *.ign /var/www/html/openshift4/4.3.0/ignitions/
+'bootstrap.ign' -&gt; '/var/www/html/openshift4/4.3.0/ignitions/bootstrap.ign'
+'master.ign' -&gt; '/var/www/html/openshift4/4.3.0/ignitions/master.ign'
+'worker.ign' -&gt; '/var/www/html/openshift4/4.3.0/ignitions/worker.ign'
+
+root@helper #&gt; restorecon -RFv /var/www/html/
+Relabeled /var/www/html/openshift4 from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/html/openshift4/4.3.0 from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/html/openshift4/4.3.0/ignitions from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/html/openshift4/4.3.0/ignitions/bootstrap.ign from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/html/openshift4/4.3.0/ignitions/master.ign from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/html/openshift4/4.3.0/ignitions/worker.ign from unconfined_u:object_r:httpd_sys_content_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+
+root@helper #&gt; chown -Rvf apache. /var/www/html/
+</code></pre></li>
+</ol>
+
+<h3 id="e-start-all-vm-and-kickstart">E. Start all VM and kickstart!</h3>
+
+<p>At this stage, start all VMs and let it automatically boot into pre-configured boot config with corresponding ignition file. No human interaction required.</p>
+
+<p><img src="static/img/masterpxe.png" alt="Master Boot" /></p>
+
+<p>And from helper node log, e.g for master01:</p>
+
+<pre><code>    Feb 14 07:12:01 helper dhcpd[1747]: DHCPDISCOVER from 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:01 helper dhcpd[1747]: DHCPOFFER on 192.168.50.61 to 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:01 helper dhcpd[1747]: DHCPREQUEST for 192.168.50.61 (192.168.50.30) from 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:01 helper dhcpd[1747]: DHCPACK on 192.168.50.61 to 52:54:00:7d:2d:b2via eth0
+    Feb 14 07:12:10 helper dhcpd[1747]: DHCPDISCOVER from 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:10 helper dhcpd[1747]: DHCPOFFER on 192.168.50.61 to 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:14 helper dhcpd[1747]: DHCPDISCOVER from 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:14 helper dhcpd[1747]: DHCPOFFER on 192.168.50.61 to 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:22 helper dhcpd[1747]: DHCPREQUEST for 192.168.50.61 (192.168.50.30) from 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:22 helper dhcpd[1747]: DHCPACK on 192.168.50.61 to 52:54:00:7d:2d:b2 via eth0
+    Feb 14 07:12:26 helper in.tftpd[2494]: Client ::ffff:192.168.50.61 finished pxelinux.0
+    Feb 14 07:12:26 helper in.tftpd[2495]: Client ::ffff:192.168.50.61 finished ldlinux.c32
+    Feb 14 07:12:26 helper in.tftpd[2496]: Client ::ffff:192.168.50.61 finished pxelinux.cfg/52-54-00-7d-2d-b2
+</code></pre>
+
+<p>Installation will go on from this point, in 10,000 feet view, this how the process looks like:</p>
+
+<ul>
+<li>Bootstrap stated temporary API and Machine Config Server.</li>
+<li>Master started etcd and wait for all peers to come up.</li>
+<li>Bootstrap will inject initial proposal to Masters etcd.</li>
+<li>Bootstrap approve all node CSRs.</li>
+<li>Bootstrap and master continue to start all necessary control plane and services.</li>
+<li>Bootstrap stopped it services.</li>
+<li>It is safe now to delete bootstrap node.</li>
+</ul>
+
+<p><strong>NOTE:</strong> Installation time taken are proportinal to infrastructure performance. If you have low network bandwidth, low performance infra, patient is the key. It should not take more than one hour to get it running for typical infrastructure performance.</p>
 
 </main>
 
